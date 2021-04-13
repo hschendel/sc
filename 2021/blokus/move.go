@@ -263,36 +263,13 @@ func HasPossibleNextMoves(s State, c Color) bool {
 }
 
 func PossibleNextMoves(s State, c Color) (moves []Move) {
- 	for radius := uint8(19); radius >= 1; radius-- {
- 		var startX, startY, stepX, stepY, stopX, stopY uint8
- 		switch c {
-		case ColorBlue:
-			startX, stepX, stopX = 0, 1, radius + 1
-			startY, stepY, stopY = 0, 1, radius
-		case ColorYellow:
-			startX, stepX, stopX = 19, 255, 19 - radius - 1
-			startY, stepY, stopY = 0, 1, radius
-		case ColorGreen:
-			startX, stepX, stopX = 19, 255, 19 - radius - 1
-			startY, stepY, stopY = 19, 255, 19 - radius
-		case ColorRed:
-			startX, stepX, stopX = 0, 1, radius + 1
-			startY, stepY, stopY = 19, 255, 19 - radius
-		default:
-			panic(fmt.Errorf("unknown color value %d", c))
-		}
-		pieces := s.NotPlayedPiecesFor(c)
-		for _, p := range pieces {
- 			for _, tp := range uniquePieceTransformations[p] {
-				for x := startX; x != stopX; x += stepX {
-					if CanPlayNextPiece(s, c, tp, x, stopY) {
-						move := NewMove(tp, x, stopY)
-						moves = append(moves, move)
-					}
-				}
-				for y := startY; y != stopY; y += stepY {
-					if CanPlayNextPiece(s, c, tp, stopX, y) {
-						move := NewMove(tp, stopX, y)
+	pieces := s.NotPlayedPiecesFor(c)
+	for _, p := range pieces {
+		for _, tp := range uniquePieceTransformations[p] {
+			for x := uint8(0); x < 20; x++ {
+				for y := uint8(0); y < 20; y++ {
+					if CanPlayNextPiece(s, c, tp, x, y) {
+						move := NewMove(tp, x, y)
 						moves = append(moves, move)
 					}
 				}
