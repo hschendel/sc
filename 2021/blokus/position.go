@@ -9,7 +9,7 @@ func PositionsEqual(a, b []Position) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	m := make(map[Position]struct{
+	m := make(map[Position]struct {
 		a int
 		b int
 	}, len(a))

@@ -31,10 +31,14 @@ func (r Rotation) String() string {
 
 func ParseRotation(s string) (rotation Rotation, err error) {
 	switch strings.TrimSpace(s) {
-	case "NONE": rotation = RotationNone
-	case "RIGHT": rotation = RotationRight
-	case "MIRROR": rotation = RotationMirror
-	case "LEFT": rotation = RotationLeft
+	case "NONE":
+		rotation = RotationNone
+	case "RIGHT":
+		rotation = RotationRight
+	case "MIRROR":
+		rotation = RotationMirror
+	case "LEFT":
+		rotation = RotationLeft
 	default:
 		err = fmt.Errorf("unknown Rotation value: %q", s)
 	}

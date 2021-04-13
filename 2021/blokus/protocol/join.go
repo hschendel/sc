@@ -18,7 +18,3 @@ type Joined struct {
 	XMLName xml.Name `xml:"joined"`
 	RoomID  string   `xml:"roomId,attr"`
 }
-
-
-
-

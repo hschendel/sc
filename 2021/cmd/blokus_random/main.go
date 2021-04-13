@@ -35,7 +35,7 @@ func main() {
 	}
 }
 
-type randomPlayer struct {}
+type randomPlayer struct{}
 
 func (r *randomPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout blokus.Timeout) blokus.Move {
 	moves := blokus.PossibleFirstMoves(state, startPiece)
@@ -67,7 +67,6 @@ func randomMoveOrEmpty(moves []blokus.Move) blokus.Move {
 	}
 	return moves[i]
 }
-
 
 func randomInt(max int) int {
 	if max <= 1 {

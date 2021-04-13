@@ -11,8 +11,8 @@ type Piece struct {
 }
 
 type Position struct {
-	X       uint8    `xml:"x,attr"`
-	Y       uint8    `xml:"y,attr"`
+	X uint8 `xml:"x,attr"`
+	Y uint8 `xml:"y,attr"`
 }
 
 type Hint struct {

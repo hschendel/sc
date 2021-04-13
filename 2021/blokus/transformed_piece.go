@@ -22,7 +22,7 @@ func NewTransformedPiece(piece Piece, rotation Rotation, flipped bool) Transform
 	}
 	return TransformedPiece(((uint8(piece) << shiftPiece) & maskPiece) |
 		((uint8(rotation) << shiftRotation) & maskRotation) |
-			((u8Flipped << shiftFlipped) & maskFlipped))
+		((u8Flipped << shiftFlipped) & maskFlipped))
 }
 
 func (p *TransformedPiece) String() string {

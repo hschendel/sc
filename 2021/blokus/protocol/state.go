@@ -3,19 +3,19 @@ package protocol
 import "encoding/xml"
 
 type State struct {
-	Turn          uint     `xml:"turn,attr"`
-	Round         uint     `xml:"round,attr"`
-	StartPiece    string   `xml:"startPiece,attr"`
-	StartTeam     StartTeam
-	BlueShapes    []string     `xml:"blueShapes>shape"`
-	YellowShapes  []string     `xml:"yellowShapes>shape"`
-	RedShapes     []string     `xml:"redShapes>shape"`
-	GreenShapes   []string     `xml:"greenShapes>shape"`
-	ValidColors   []string     `xml:"validColors>color"`
-	FirstTeam     Team         `xml:"first"`
-	SecondTeam    Team         `xml:"second"`
-	Board         []Field      `xml:"board>field"`
-	LastMoveMono  []ColorEntry `xml:"lastMoveMono>entry,omitempty"`
+	Turn         uint   `xml:"turn,attr"`
+	Round        uint   `xml:"round,attr"`
+	StartPiece   string `xml:"startPiece,attr"`
+	StartTeam    StartTeam
+	BlueShapes   []string     `xml:"blueShapes>shape"`
+	YellowShapes []string     `xml:"yellowShapes>shape"`
+	RedShapes    []string     `xml:"redShapes>shape"`
+	GreenShapes  []string     `xml:"greenShapes>shape"`
+	ValidColors  []string     `xml:"validColors>color"`
+	FirstTeam    Team         `xml:"first"`
+	SecondTeam   Team         `xml:"second"`
+	Board        []Field      `xml:"board>field"`
+	LastMoveMono []ColorEntry `xml:"lastMoveMono>entry,omitempty"`
 }
 
 type StartTeam struct {

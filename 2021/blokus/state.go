@@ -19,10 +19,24 @@ type MutableState interface {
 	SetLastMoveMono(c Color, isLastMoveMono bool)
 }
 
+func CopyState(into MutableState, from State) {
+	for x := uint8(0); x < 20; x++ {
+		for y := uint8(0); y < 20; y++ {
+			color, hasPiece := from.At(x, y)
+			into.Set(x, y, color, hasPiece)
+		}
+	}
+	for c := 0; c < 4; c++ {
+		color := Color(c)
+		into.SetNotPlayedPiecesFor(color, from.NotPlayedPiecesFor(color))
+		into.SetLastMoveMono(color, from.IsLastMoveMono(color))
+	}
+}
+
 type BasicState struct {
-	board [20][20]boardValue
+	board           [20][20]boardValue
 	notPlayedPieces [4][]Piece
-	lastMoveMono [4]bool
+	lastMoveMono    [4]bool
 }
 
 func (b *BasicState) At(x, y uint8) (c Color, hasPiece bool) {
@@ -104,7 +118,7 @@ func (b *BasicState) SetPiecePlayed(c Color, p Piece, isPlayed bool) {
 				if (i + 1) < l {
 					copy(b.notPlayedPieces[c][i:l-1], b.notPlayedPieces[c][i+1:l])
 				}
-				b.notPlayedPieces[c] = b.notPlayedPieces[c][0:l-1]
+				b.notPlayedPieces[c] = b.notPlayedPieces[c][0 : l-1]
 			}
 			return
 		}

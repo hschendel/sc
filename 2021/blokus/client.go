@@ -14,12 +14,12 @@ import (
 )
 
 type Client struct {
-	Conn             net.Conn
-	Player           Player
-	MoveTimeout      time.Duration
-	State            MutableState
-	ReservationCode  string
-	DebugTo			 *os.File
+	Conn            net.Conn
+	Player          Player
+	MoveTimeout     time.Duration
+	State           MutableState
+	ReservationCode string
+	DebugTo         *os.File
 }
 
 func OpenClient(address net.Addr, player Player, emptyState MutableState) (cl *Client, err error) {
@@ -48,6 +48,7 @@ var DefaultServerAddress net.Addr = &net.TCPAddr{
 	IP:   net.IPv4(127, 0, 0, 1),
 	Port: DefaultServerPort,
 }
+
 const DefaultServerPort = 13050
 const DefaultMoveTimeout = 2 * time.Second
 
@@ -121,8 +122,8 @@ func (c *Client) Run() (err error) {
 type xmlConn struct {
 	enc *xml.Encoder
 	dec *xml.Decoder
-	w io.Writer
-	r io.Reader
+	w   io.Writer
+	r   io.Reader
 }
 
 func (x *xmlConn) init(conn net.Conn, debugTo *os.File) {

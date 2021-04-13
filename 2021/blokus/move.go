@@ -142,7 +142,7 @@ func CanPlayFirstPiece(s State, p TransformedPiece, x, y uint8) bool {
 	for dx := uint8(0); dx < p.Width(); dx++ {
 		for dy := uint8(0); dy < p.Height(); dy++ {
 			if p.Fills(dx, dy) {
-				px, py := x + dx, y + dy
+				px, py := x+dx, y+dy
 				if _, hasPiece := s.At(px, py); hasPiece {
 					// already filled
 					return false
@@ -173,7 +173,7 @@ func CanPlayNextPiece(s State, c Color, p TransformedPiece, x, y uint8) bool {
 	}
 	hasAdjacent := false
 	for _, piecePos := range p.Positions() {
-		px, py := x + piecePos.X, y + piecePos.Y
+		px, py := x+piecePos.X, y+piecePos.Y
 		if _, hasPiece := s.At(px, py); hasPiece {
 			// already filled
 			return false
@@ -188,45 +188,45 @@ func CanPlayNextPiece(s State, c Color, p TransformedPiece, x, y uint8) bool {
 		}
 	}
 	/*
-	for dx := uint8(0); dx < p.Width(); dx++ {
-		for dy := uint8(0); dy < p.Height(); dy++ {
-			if p.Fills(dx, dy) {
-				px, py := x + dx, y + dy
-				if _, hasPiece := s.At(px, py); hasPiece {
-					// already filled
-					return false
-				}
-				// must not touch same color
-				if HasDirectNeighborWithColor(s, c, px, py) {
-					return false
-				}
-				// at least one pixel must be adjacent to an existing pixel of the same color
-				if !hasAdjacent {
-					hasAdjacent = HasAdjacentWithColor(s, c, px, py)
+		for dx := uint8(0); dx < p.Width(); dx++ {
+			for dy := uint8(0); dy < p.Height(); dy++ {
+				if p.Fills(dx, dy) {
+					px, py := x + dx, y + dy
+					if _, hasPiece := s.At(px, py); hasPiece {
+						// already filled
+						return false
+					}
+					// must not touch same color
+					if HasDirectNeighborWithColor(s, c, px, py) {
+						return false
+					}
+					// at least one pixel must be adjacent to an existing pixel of the same color
+					if !hasAdjacent {
+						hasAdjacent = HasAdjacentWithColor(s, c, px, py)
+					}
 				}
 			}
 		}
-	}
-	 */
+	*/
 	return hasAdjacent
 }
 
 func IsOnBoard(p TransformedPiece, x, y uint8) bool {
-	return (x + p.Width() - 1) < 20 && (y + p.Height() - 1) < 20
+	return (x+p.Width()-1) < 20 && (y+p.Height()-1) < 20
 }
 
 func HasDirectNeighborWithColor(s State, c Color, x, y uint8) bool {
-	return HasColorAt(s, c, x - 1, y) ||
-		HasColorAt(s, c, x, y - 1) ||
-		HasColorAt(s, c, x + 1, y) ||
-		HasColorAt(s, c, x, y + 1)
+	return HasColorAt(s, c, x-1, y) ||
+		HasColorAt(s, c, x, y-1) ||
+		HasColorAt(s, c, x+1, y) ||
+		HasColorAt(s, c, x, y+1)
 }
 
 func HasAdjacentWithColor(s State, c Color, x, y uint8) bool {
-	return HasColorAt(s, c, x - 1, y - 1) ||
-		HasColorAt(s, c, x + 1, y - 1) ||
-		HasColorAt(s, c, x - 1, y + 1) ||
-		HasColorAt(s, c, x + 1, y + 1)
+	return HasColorAt(s, c, x-1, y-1) ||
+		HasColorAt(s, c, x+1, y-1) ||
+		HasColorAt(s, c, x-1, y+1) ||
+		HasColorAt(s, c, x+1, y+1)
 }
 
 func HasColorAt(s State, c Color, x, y uint8) bool {

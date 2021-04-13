@@ -3,13 +3,13 @@ package blokus
 import "testing"
 
 func TestPossibleFirstMoves(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		fp Piece
 		e  []Move
-	} {
+	}{
 		{
 			fp: PieceMono,
-			e: []Move {
+			e: []Move{
 				NewMove(NewTransformedPiece(PieceMono, RotationNone, false), 0, 0),
 				NewMove(NewTransformedPiece(PieceMono, RotationNone, false), 19, 0),
 				NewMove(NewTransformedPiece(PieceMono, RotationNone, false), 19, 19),
@@ -18,7 +18,7 @@ func TestPossibleFirstMoves(t *testing.T) {
 		},
 		{
 			fp: PieceDomino,
-			e: []Move {
+			e: []Move{
 				NewMove(NewTransformedPiece(PieceDomino, RotationNone, false), 0, 0),
 				NewMove(NewTransformedPiece(PieceDomino, RotationRight, false), 0, 0),
 				NewMove(NewTransformedPiece(PieceDomino, RotationNone, false), 18, 0),
@@ -31,7 +31,7 @@ func TestPossibleFirstMoves(t *testing.T) {
 		},
 		{
 			fp: PieceTrioL,
-			e: []Move {
+			e: []Move{
 				NewMove(NewTransformedPiece(PieceTrioL, RotationNone, false), 0, 0),
 				NewMove(NewTransformedPiece(PieceTrioL, RotationNone, false), 18, 18),
 				NewMove(NewTransformedPiece(PieceTrioL, RotationNone, false), 0, 18),

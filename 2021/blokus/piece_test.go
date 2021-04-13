@@ -12,7 +12,7 @@ func Test_uniquePieceTransformations(t *testing.T) {
 			for dj, tpj := range tpl[i+1:] {
 				pj := tpj.Positions()
 				if PositionsEqual(pi, pj) {
-					t.Errorf("Piece %s: equal transformations %d (%s) and %d (%s)\n\n%s\n\n%s", Piece(p).String(), i, tpi.String(), i + dj + 1, tpj.String(), tpi.PrettyFormat('I', "  "), tpj.PrettyFormat('J', "  "))
+					t.Errorf("Piece %s: equal transformations %d (%s) and %d (%s)\n\n%s\n\n%s", Piece(p).String(), i, tpi.String(), i+dj+1, tpj.String(), tpi.PrettyFormat('I', "  "), tpj.PrettyFormat('J', "  "))
 				}
 			}
 		}
@@ -26,7 +26,7 @@ func Test_rotateLeft(t *testing.T) {
 	}{
 		{
 			p: PieceDomino,
-			e: []Position{{0,0}, {0, 1}},
+			e: []Position{{0, 0}, {0, 1}},
 		},
 		{
 			p: PieceTrioL,
@@ -40,5 +40,3 @@ func Test_rotateLeft(t *testing.T) {
 		}
 	}
 }
-
-

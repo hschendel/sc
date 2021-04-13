@@ -32,4 +32,3 @@ func (l *loggingWriter) Write(p []byte) (n int, err error) {
 	}
 	return
 }
-
