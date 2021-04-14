@@ -67,11 +67,11 @@ func pickBestMove(s blokus.State, c blokus.Color, moves []blokus.Move) blokus.Mo
 	log.Printf("Pick move for %s", c.String())
 	var ms blokus.BasicState
 	blokus.CopyState(&ms, s)
-	ratedMoves := make(sortRatedMoves, 0, len(moves))
+	var ratedMoves sortRatedMoves
 	startRateT := time.Now()
 	const rateTimeout = time.Millisecond * 1500
 	for _, move := range moves {
-		ratedMoves = append(ratedMoves, rateMove(&ms, c, move))
+		ratedMoves.m = append(ratedMoves.m, rateMove(&ms, c, move))
 		if time.Since(startRateT) > rateTimeout {
 			log.Println("reached rating timeout")
 			break
@@ -79,45 +79,41 @@ func pickBestMove(s blokus.State, c blokus.Color, moves []blokus.Move) blokus.Mo
 	}
 	rateD := time.Since(startRateT)
 	startSortT := time.Now()
-	sort.Sort(ratedMoves)
+	sort.Sort(&ratedMoves)
 	sortD := time.Since(startSortT)
-	log.Printf("took %s to rate %d/%d moves, and %s to sort them.", rateD.String(), len(ratedMoves), len(moves), sortD.String())
+	log.Printf("took %s to rate %d/%d moves, and %s to sort them.", rateD.String(), len(ratedMoves.m), len(moves), sortD.String())
 	sameRatingIdx := 0
-	for i, ratedMove := range ratedMoves {
+	log.Printf("best moves:\n%s", ratedMoves.m[0].move.FormatPretty('X', "  "))
+	for i, ratedMove := range ratedMoves.m {
 		if i == 0 {
 			continue
 		}
-		if ratedMove.move.Transformation.Piece().NumPoints() < ratedMoves[0].move.Transformation.Piece().NumPoints() {
+		if ratedMove.move.Transformation.Piece().NumPoints() < ratedMoves.m[0].move.Transformation.Piece().NumPoints() {
 			break
 		}
-		if ratedMove.stateRating == ratedMoves[0].stateRating {
+		if ratedMove.stateRating == ratedMoves.m[0].stateRating {
+			log.Print(ratedMove.move.FormatPretty('X', "  "))
 			sameRatingIdx = i
 		} else {
 			break
 		}
 	}
+	if sameRatingIdx > 0 {
+		log.Printf("choosing randomly between %d moves", sameRatingIdx+1)
+	}
 	moveIdx := randomInt(sameRatingIdx + 1)
-	move := ratedMoves[moveIdx].move
-	log.Printf("Picked move: %s\n  enemy moves possible: %d\nown extend: %d\n", move.FormatPretty('X', "  "), ratedMoves[moveIdx].enemyMoves, ratedMoves[moveIdx].volumeDiff)
+	move := ratedMoves.m[moveIdx].move
+	log.Printf("Picked move: %s\n  enemy moves possible: %d\nown extend: %d\n", move.FormatPretty('X', "  "), ratedMoves.m[moveIdx].enemyMoves, ratedMoves.m[moveIdx].volumeDiff)
 	return move
 }
 
 func presortMoves(s blokus.State, c blokus.Color, moves []blokus.Move) {
 	var sm sortMoves
 	sm.m = moves
-	for _, pos := range blokus.StartCorners {
-		if cc, found := s.At(pos.X, pos.Y); found && cc == c {
-			if pos.X == 0 {
-				sm.goRight = true
-			}
-			if pos.Y == 0 {
-				sm.goDown = true
-			}
-			break
-		}
-	}
+	sm.goDown, sm.goRight = blokus.ColorDirection(s, c)
 	sort.Sort(&sm)
 }
+
 
 type sortMoves struct {
 	m       []blokus.Move
@@ -164,29 +160,37 @@ func (s sortMoves) Swap(i, j int) {
 	s.m[i] = tmp
 }
 
-type sortRatedMoves []ratedMove
-
-func (s sortRatedMoves) Len() int {
-	return len(s)
+type sortRatedMoves struct {
+	m []ratedMove
 }
 
-func (s sortRatedMoves) Less(i, j int) bool {
+func (s *sortRatedMoves) Len() int {
+	return len(s.m)
+}
+
+func (s *sortRatedMoves) Less(i, j int) bool {
 	// 1) least possible enemy moves
-	if s[i].enemyMoves != s[j].enemyMoves {
-		return s[i].enemyMoves < s[j].enemyMoves
+	if s.m[i].enemyMoves != s.m[j].enemyMoves {
+		return s.m[i].enemyMoves < s.m[j].enemyMoves
 	}
 	// 2) piece size (larger first)
-	if s[i].move.Transformation.Piece().NumPoints() != s[j].move.Transformation.Piece().NumPoints() {
-		return s[i].move.Transformation.Piece().NumPoints() > s[j].move.Transformation.Piece().NumPoints()
+	if s.m[i].move.Transformation.Piece().NumPoints() != s.m[j].move.Transformation.Piece().NumPoints() {
+		return s.m[i].move.Transformation.Piece().NumPoints() > s.m[j].move.Transformation.Piece().NumPoints()
 	}
-	// 3) own volume extend
-	return s[i].volumeDiff > s[j].volumeDiff
+	// 3) height * width of own color
+	areaI := s.m[i].area()
+	areaJ := s.m[j].area()
+	if areaI != areaJ {
+		return areaI > areaJ
+	}
+	// 4) own volume extend
+	return s.m[i].volumeDiff > s.m[j].volumeDiff
 }
 
 func (s sortRatedMoves) Swap(i, j int) {
-	tmp := s[i]
-	s[j] = s[i]
-	s[i] = tmp
+	tmp := s.m[i]
+	s.m[j] = s.m[i]
+	s.m[i] = tmp
 }
 
 func rateMove(s blokus.MutableState, c blokus.Color, m blokus.Move) (r ratedMove) {
@@ -207,18 +211,26 @@ type ratedMove struct {
 type stateRating struct {
 	enemyMoves uint64
 	volumeDiff uint64
+	height     uint8
+	width      uint8
+}
+
+func (r *stateRating) area() uint64 {
+	return uint64(r.height) * uint64(r.width)
 }
 
 func rateState(s blokus.State, c blokus.Color) (rating stateRating) {
 	enemyColors := blokus.EnemyColors(c)
 	ownColors := blokus.OwnColors(c)
 	rating.enemyMoves = uint64(len(blokus.PossibleNextMoves(s, enemyColors[0]))) + uint64(len(blokus.PossibleNextMoves(s, enemyColors[1])))
-	volume := volumeExtend(s)
+	volume, height, width := volumeExtend(s)
 	rating.volumeDiff = volume[ownColors[0]] + volume[ownColors[1]] - volume[enemyColors[0]] - volume[enemyColors[1]]
+	rating.height = height[c]
+	rating.width = width[c]
 	return
 }
 
-func volumeExtend(s blokus.State) (v [4]uint64) {
+func volumeExtend(s blokus.State) (v [4]uint64, h, w [4]uint8) {
 	var minX, minY, maxX, maxY [4]uint8
 	for x := uint8(0); x < 20; x++ {
 		for y := uint8(0); y < 20; y++ {
@@ -241,7 +253,9 @@ func volumeExtend(s blokus.State) (v [4]uint64) {
 		}
 	}
 	for c := uint8(0); c < 4; c++ {
-		v[c] = uint64(maxX[c]-minX[c]) * uint64(maxY[c]-minY[c])
+		h[c] = maxY[c] - minY[c]
+		w[c] = maxX[c] - minX[c]
+		v[c] = uint64(w[c]) * uint64(h[c])
 	}
 	return
 }

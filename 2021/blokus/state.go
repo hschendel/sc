@@ -33,6 +33,21 @@ func CopyState(into MutableState, from State) {
 	}
 }
 
+func ColorDirection(s State, c Color) (goDown, goRight bool) {
+	for _, pos := range StartCorners {
+		if cc, found := s.At(pos.X, pos.Y); found && cc == c {
+			if pos.X == 0 {
+				goRight = true
+			}
+			if pos.Y == 0 {
+				goDown = true
+			}
+			return
+		}
+	}
+	return
+}
+
 type BasicState struct {
 	board           [20][20]boardValue
 	notPlayedPieces [4][]Piece
