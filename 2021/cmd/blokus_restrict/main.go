@@ -114,7 +114,6 @@ func presortMoves(s blokus.State, c blokus.Color, moves []blokus.Move) {
 	sort.Sort(&sm)
 }
 
-
 type sortMoves struct {
 	m       []blokus.Move
 	goDown  bool

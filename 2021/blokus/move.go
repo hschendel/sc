@@ -187,27 +187,6 @@ func CanPlayNextPiece(s State, c Color, p TransformedPiece, x, y uint8) bool {
 			hasAdjacent = HasAdjacentWithColor(s, c, px, py)
 		}
 	}
-	/*
-		for dx := uint8(0); dx < p.Width(); dx++ {
-			for dy := uint8(0); dy < p.Height(); dy++ {
-				if p.Fills(dx, dy) {
-					px, py := x + dx, y + dy
-					if _, hasPiece := s.At(px, py); hasPiece {
-						// already filled
-						return false
-					}
-					// must not touch same color
-					if HasDirectNeighborWithColor(s, c, px, py) {
-						return false
-					}
-					// at least one pixel must be adjacent to an existing pixel of the same color
-					if !hasAdjacent {
-						hasAdjacent = HasAdjacentWithColor(s, c, px, py)
-					}
-				}
-			}
-		}
-	*/
 	return hasAdjacent
 }
 
