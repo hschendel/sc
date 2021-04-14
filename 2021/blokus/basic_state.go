@@ -1,5 +1,7 @@
 package blokus
 
+import "fmt"
+
 // BasicState is a quite inefficient way of storing the game state
 type BasicState struct {
 	board           [20][20]boardValue
@@ -62,6 +64,9 @@ func (b *BasicState) Reset() {
 }
 
 func (b *BasicState) Set(x, y uint8, c Color, hasPiece bool) {
+	if x > 19 || y > 19 {
+		panic(fmt.Errorf("trying to set (color=%s, hasPiece=%v) at invalid coordinates x=%d y%d", c.String(), hasPiece, x, y))
+	}
 	b.board[x][y] = boardValue{
 		color:    c,
 		hasPiece: hasPiece,

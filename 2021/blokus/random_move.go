@@ -1,29 +1,28 @@
-package example_players
+package blokus
 
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/hschendel/sc/2021/blokus"
 	"math/big"
 )
 
-func randomMove(moves []blokus.Move) blokus.Move {
+func RandomMove(moves []Move) Move {
 	if len(moves) == 0 {
 		panic("len(moves) == 0")
 	}
-	i := randomInt(len(moves))
+	i := RandomInt(len(moves))
 	return moves[i]
 }
 
-func randomMoveOrEmpty(moves []blokus.Move) blokus.Move {
-	i := randomInt(len(moves) + 1)
+func RandomMoveOrEmpty(moves []Move) Move {
+	i := RandomInt(len(moves) + 1)
 	if i == len(moves) {
-		return blokus.EmptyMove
+		return EmptyMove
 	}
 	return moves[i]
 }
 
-func randomInt(max int) int {
+func RandomInt(max int) int {
 	if max <= 1 {
 		return 0
 	}

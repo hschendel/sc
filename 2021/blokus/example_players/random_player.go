@@ -8,13 +8,13 @@ type RandomPlayer struct{}
 
 func (r *RandomPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout blokus.Timeout) blokus.Move {
 	moves := blokus.PossibleFirstMoves(state, startPiece)
-	move := randomMove(moves)
+	move := blokus.RandomMove(moves)
 	return move
 }
 
 func (r *RandomPlayer) NextMove(state blokus.State, color blokus.Color, timeout blokus.Timeout) blokus.Move {
 	moves := blokus.PossibleNextMoves(state, color)
-	move := randomMoveOrEmpty(moves)
+	move := blokus.RandomMoveOrEmpty(moves)
 	return move
 }
 

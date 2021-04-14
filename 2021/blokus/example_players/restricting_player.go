@@ -71,7 +71,7 @@ func (rp *RestrictingPlayer) pickBestMove(s blokus.State, c blokus.Color, moves 
 	if sameRatingIdx > 0 {
 		log.Printf("choosing randomly between %d moves", sameRatingIdx+1)
 	}
-	moveIdx := randomInt(sameRatingIdx + 1)
+	moveIdx := blokus.RandomInt(sameRatingIdx + 1)
 	move := ratedMoves.m[moveIdx].move
 	log.Printf("Picked move: %s\n  enemy moves possible: %d\nown extend: %d\n", move.FormatPretty('X', "  "), ratedMoves.m[moveIdx].enemyMoves, ratedMoves.m[moveIdx].volumeDiff)
 	return move

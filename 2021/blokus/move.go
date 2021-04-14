@@ -200,7 +200,7 @@ func CanPlayNextPiece(s State, c Color, p TransformedPiece, x, y uint8) bool {
 }
 
 func IsOnBoard(p TransformedPiece, x, y uint8) bool {
-	return (x+p.Width()-1) < 20 && (y+p.Height()-1) < 20
+	return x < 20 && y < 20 && (x+p.Width()-1) < 20 && (y+p.Height()-1) < 20
 }
 
 func HasDirectNeighborWithColor(s State, c Color, x, y uint8) bool {

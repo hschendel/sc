@@ -52,7 +52,7 @@ func (q *QuickPlayer) pickBestMove(s blokus.State, c blokus.Color, moves []bloku
 			break
 		}
 	}
-	moveIdx := randomInt(sameRatingIdx + 1)
+	moveIdx := blokus.RandomInt(sameRatingIdx + 1)
 	move := ratedMoves[moveIdx].move
 	log.Printf("Picked move: %s\n  volume diff: %d\n  field coverage diff: %d\n", move.FormatPretty('X', "  "), ratedMoves[moveIdx].volumeDiff, ratedMoves[moveIdx].countDiff)
 	return move
