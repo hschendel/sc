@@ -60,27 +60,72 @@ func TestPossibleFirstMoves(t *testing.T) {
 func TestPossibleNextMoves(t *testing.T) {
 	// color is always ColorRed
 	var s0 BasicState
-	s0.Set(0, 0, ColorRed, true)
+	s0.Set(19, 19, ColorRed, true)
 	s0.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceTetroO})
 	var s1 BasicState
-	s1.Set(0, 0, ColorRed, true)
-	s1.Set(1,1, ColorRed, true)
-	s1.Set(0, 2, ColorGreen, true)
+	s1.Set(0, 19, ColorRed, true)
+	s1.Set(1,18, ColorRed, true)
+	s1.Set(0, 17, ColorGreen, true)
 	s1.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceMono})
+	s2 := earlyTestState()
 	tpTetroO := NewTransformedPiece(PieceTetroO, RotationNone, false)
 	tpMono := NewTransformedPiece(PieceMono, RotationNone, false)
+	// tpDomino := NewTransformedPiece(PieceDomino, RotationNone, false)
+	// tpDominoI := NewTransformedPiece(PieceDomino, RotationRight, false)
 	var cases = []struct {
 		s State
 		e []Move
+		l int // expectend length to avoid listing all moves
 	}{
-		{ &s0, []Move {NewMove(tpTetroO, 1, 1)}},
-		{ &s1, []Move {NewMove(tpMono, 2, 2), NewMove(tpMono, 2, 0)}},
+		{ s: &s0, e: []Move {NewMove(tpTetroO, 17, 17)}},
+		{ s: &s1, e: []Move {NewMove(tpMono, 2, 17), NewMove(tpMono, 2, 19)}},
+		{ s: s2, l: 311},
 	}
 
 	for i, tc := range cases {
 		o := PossibleNextMoves(tc.s, ColorRed)
-		if !MovesEqual(tc.e, o) {
-			t.Errorf("case %d: failed.\nexpected:\n%s\ngot:\n%s", i, FormatPrettyMoves(tc.e, 'X', "  "), FormatPrettyMoves(tc.e, 'X', "  "))
+		if tc.e == nil {
+			if tc.l != len(o) {
+				t.Errorf("case %d failed. Expected %d moves but got %d", i, tc.l, len(o))
+			}
+		} else if !MovesEqual(tc.e, o) {
+			t.Errorf("case %d failed.\nexpected:\n%s\ngot:\n%s", i, FormatPrettyMoves(tc.e, 'X', "  "), FormatPrettyMoves(o, 'X', "  "))
 		}
 	}
+}
+
+func BenchmarkPossibleNextMovesEarly(b *testing.B) {
+	b.StopTimer()
+	s := earlyTestState()
+	b.StartTimer()
+	benchmarkNextMovesImpl(b, s, ColorBlue, PossibleNextMoves)
+}
+
+func BenchmarkPossibleNextMovesSimpleEarly(b *testing.B) {
+	b.StopTimer()
+	s := earlyTestState()
+	b.StartTimer()
+	benchmarkNextMovesImpl(b, s, ColorBlue, possibleNextMovesSimple)
+}
+
+func benchmarkNextMovesImpl(b *testing.B, s State, c Color, f func(s State, c Color) []Move) {
+	b.Helper()
+	for n := 0; n < b.N; n++ {
+		_ = f(s, c)
+	}
+}
+
+func earlyTestState() State {
+	s := new(BasicState)
+
+	MustApplyMove(s, ColorBlue, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 0, 0))
+	MustApplyMove(s, ColorYellow, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 18, 0))
+	MustApplyMove(s, ColorRed, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 0, 18))
+	MustApplyMove(s, ColorGreen, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 18, 18))
+
+	MustApplyMove(s, ColorBlue, NewMove(NewTransformedPiece(PiecePentoW, RotationNone, false), 2, 2))
+	MustApplyMove(s, ColorYellow, NewMove(NewTransformedPiece(PiecePentoI, RotationRight, false), 13, 2))
+	MustApplyMove(s, ColorRed, NewMove(NewTransformedPiece(PiecePentoL, RotationLeft, false), 2, 16))
+	MustApplyMove(s, ColorGreen, NewMove(NewTransformedPiece(PiecePentoY, RotationRight, true), 14, 16))
+	return s
 }

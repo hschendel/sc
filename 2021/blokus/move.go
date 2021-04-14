@@ -3,6 +3,7 @@ package blokus
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -95,6 +96,14 @@ func ApplyMove(s MutableState, c Color, m Move) error {
 		s.SetLastMoveMono(c, true)
 	}
 	return nil
+}
+
+func MustApplyMove(s MutableState, c Color, m Move) {
+	err := ApplyMove(s, c, m)
+	if err != nil {
+		log.Printf("invalid move:\n%s", m.FormatPretty('X', "  "))
+		panic(err)
+	}
 }
 
 // UndoMove reverts a move.
@@ -242,6 +251,85 @@ func HasPossibleNextMoves(s State, c Color) bool {
 }
 
 func PossibleNextMoves(s State, c Color) (moves []Move) {
+	pieces := s.NotPlayedPiecesFor(c)
+	scX, scY, started := StartCorner(s, c)
+	if !started {
+		panic(fmt.Errorf("color %s has not yet started, use PossibleFirstMoves()", c.String()))
+	}
+	applyRadiusX := applyRadiusInc
+	shiftLeft := false
+	applyRadiusY := applyRadiusInc
+	shiftUp := false
+	if scX == 19 {
+		applyRadiusX = applyRadiusDec
+		shiftLeft = true
+	}
+	if scY == 19 {
+		applyRadiusY = applyRadiusDec
+		shiftUp = true
+	}
+
+	for radius := uint8(1); radius < 20; radius++ {
+		startX, endX, stepX, rX := applyRadiusX(radius)
+		startY, _, stepY, rY := applyRadiusY(radius)
+		colorFound := false
+		for x := startX; x != endX; x += stepX {
+			if cc, cFound := s.At(x, rY); cFound && cc == c {
+				colorFound = true
+			}
+			moves = addPlayableMoves(s, pieces, c, shiftLeft, shiftUp, x, rY, moves)
+		}
+		for y := startY; y != rY; y += stepY {
+			if cc, cFound := s.At(rX, y); cFound && cc == c {
+				colorFound = true
+			}
+			moves = addPlayableMoves(s, pieces, c, shiftLeft, shiftUp, rX, y, moves)
+		}
+		if !colorFound {
+			// cut-off: there will be no more moves with a higher radius
+			break
+		}
+	}
+	return
+}
+
+func addPlayableMoves(s State, pieces []Piece, c Color, shiftLeft, shiftUp bool, x, y uint8, moves []Move) (movesResult []Move) {
+	movesResult = moves
+	for _, p := range pieces {
+		for _, tp := range uniquePieceTransformations[p] {
+			tx, ty := x, y
+			if shiftLeft {
+				tx -= tp.Width() - 1
+			}
+			if shiftUp {
+				ty -= tp.Height() - 1
+			}
+			if CanPlayNextPiece(s, c, tp, tx, ty) {
+				move := NewMove(tp, tx, ty)
+				movesResult = append(movesResult, move)
+			}
+		}
+	}
+	return
+}
+
+func applyRadiusInc(radius uint8) (start, end, step, fixed uint8) {
+	start = 0
+	end = radius + 1
+	step = 1
+	fixed = radius
+	return
+}
+
+func applyRadiusDec(radius uint8) (start, end, step, fixed uint8) {
+	start = 19
+	end = 19 - radius - 1
+	step = 255
+	fixed = 19 - radius
+	return
+}
+
+func possibleNextMovesSimple(s State, c Color) (moves []Move) {
 	pieces := s.NotPlayedPiecesFor(c)
 	for _, p := range pieces {
 		for _, tp := range uniquePieceTransformations[p] {
