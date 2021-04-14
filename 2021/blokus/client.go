@@ -338,7 +338,7 @@ func parsePieces(sl []string) (pieces []Piece, err error) {
 
 // ClientMain can be used to implement a simple player main function.
 // It uses os.Args
-func ClientMain(player Player, stateImpl MutableState) {
+func ClientMain(player Player) {
 	addr := DefaultServerAddress
 	if len(os.Args) > 1 {
 		port, err := strconv.Atoi(os.Args[1])
@@ -350,7 +350,8 @@ func ClientMain(player Player, stateImpl MutableState) {
 			Port: port,
 		}
 	}
-	client, err := OpenClient(addr, player, stateImpl)
+	var state BasicState
+	client, err := OpenClient(addr, player, &state)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "cannot connect to server: %s", err)
 		os.Exit(1)

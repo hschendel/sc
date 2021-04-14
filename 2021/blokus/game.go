@@ -114,7 +114,7 @@ func RunGame(player1, player2 Player) (result GameResult, score1, score2 uint, e
 
 	for ; !tr.gameEnded; tr.nextColor() {
 		player, color := tr.current()
-		if !tr.firstRound() && len(PossibleNextMoves(&state, color)) == 0 {
+		if !tr.firstRound() && !HasPossibleNextMoves(&state, color) {
 			tr.endCurrent()
 			continue
 		}

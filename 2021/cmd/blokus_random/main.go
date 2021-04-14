@@ -7,6 +7,5 @@ import (
 
 func main() {
 	player := new(example_players.RandomPlayer)
-	state := new(blokus.BasicState)
-	blokus.ClientMain(player, state)
+	blokus.ClientMain(player)
 }
