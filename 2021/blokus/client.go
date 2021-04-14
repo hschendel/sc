@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -333,4 +334,31 @@ func parsePieces(sl []string) (pieces []Piece, err error) {
 		pieces = append(pieces, p)
 	}
 	return
+}
+
+// ClientMain can be used to implement a simple player main function.
+// It uses os.Args
+func ClientMain(player Player, stateImpl MutableState) {
+	addr := DefaultServerAddress
+	if len(os.Args) > 1 {
+		port, err := strconv.Atoi(os.Args[1])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid value for port: %q", os.Args[1])
+		}
+		addr = &net.TCPAddr{
+			IP:   net.IPv4(127, 0, 0, 1),
+			Port: port,
+		}
+	}
+	client, err := OpenClient(addr, player, stateImpl)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cannot connect to server: %s", err)
+		os.Exit(1)
+	}
+	client.DebugTo = os.Stderr
+	err = client.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error while running: %s", err)
+		os.Exit(2)
+	}
 }
