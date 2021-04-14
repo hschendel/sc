@@ -56,3 +56,31 @@ func TestPossibleFirstMoves(t *testing.T) {
 		}
 	}
 }
+
+func TestPossibleNextMoves(t *testing.T) {
+	// color is always ColorRed
+	var s0 BasicState
+	s0.Set(0, 0, ColorRed, true)
+	s0.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceTetroO})
+	var s1 BasicState
+	s1.Set(0, 0, ColorRed, true)
+	s1.Set(1,1, ColorRed, true)
+	s1.Set(0, 2, ColorGreen, true)
+	s1.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceMono})
+	tpTetroO := NewTransformedPiece(PieceTetroO, RotationNone, false)
+	tpMono := NewTransformedPiece(PieceMono, RotationNone, false)
+	var cases = []struct {
+		s State
+		e []Move
+	}{
+		{ &s0, []Move {NewMove(tpTetroO, 1, 1)}},
+		{ &s1, []Move {NewMove(tpMono, 2, 2), NewMove(tpMono, 2, 0)}},
+	}
+
+	for i, tc := range cases {
+		o := PossibleNextMoves(tc.s, ColorRed)
+		if !MovesEqual(tc.e, o) {
+			t.Errorf("case %d: failed.\nexpected:\n%s\ngot:\n%s", i, FormatPrettyMoves(tc.e, 'X', "  "), FormatPrettyMoves(tc.e, 'X', "  "))
+		}
+	}
+}
