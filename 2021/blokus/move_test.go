@@ -108,14 +108,16 @@ func BenchmarkPossibleNextMovesSimpleEarly(b *testing.B) {
 	benchmarkNextMovesImpl(b, s, ColorBlue, possibleNextMovesSimple)
 }
 
+var benchmarkNextMovesImplResult []Move
+
 func benchmarkNextMovesImpl(b *testing.B, s State, c Color, f func(s State, c Color) []Move) {
 	b.Helper()
 	for n := 0; n < b.N; n++ {
-		_ = f(s, c)
+		benchmarkNextMovesImplResult = f(s, c)
 	}
 }
 
-func earlyTestState() State {
+func earlyTestState() *BasicState {
 	s := new(BasicState)
 
 	MustApplyMove(s, ColorBlue, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 0, 0))
