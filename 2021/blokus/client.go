@@ -80,15 +80,13 @@ func (c *Client) Run() (err error) {
 		colors[0] = ColorYellow
 		colors[1] = ColorGreen
 	}
-	colorIdx := 0
 	var gameEnded bool
 	var validColors map[Color]bool
 
-	for {
+	for colorIdx := 0; ; colorIdx = (colorIdx + 1) % len(colors) {
 		if gameEnded, validColors, err = xc.waitForMoveRequest(roomID, c.State); err != nil || gameEnded {
 			return
 		}
-		colorIdx = (colorIdx + 1) % len(colors)
 		playerColor := colors[colorIdx]
 		if !validColors[playerColor] {
 			// advance to next color if playerColor is not valid
