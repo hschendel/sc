@@ -11,19 +11,6 @@ import (
 // RestrictingPlayer tries to pick the move most restricting the enemy's moves.
 type RestrictingPlayer struct{}
 
-func (rp *RestrictingPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout sc.Timeout) (move blokus.Move) {
-	moves := blokus.PossibleFirstMoves(state, startPiece)
-	bestVolume := uint8(0)
-	for _, m := range moves {
-		moveVol := m.Transformation.Width() * m.Transformation.Height()
-		if moveVol > bestVolume {
-			move = m
-			bestVolume = moveVol
-		}
-	}
-	return
-}
-
 func (rp *RestrictingPlayer) NextMove(state blokus.State, color blokus.Color, timeout sc.Timeout) blokus.Move {
 	moves := blokus.PossibleNextMoves(state, color)
 	presortMoves(state, color, moves)

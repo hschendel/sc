@@ -123,11 +123,9 @@ func UndoMove(s MutableState, c Color, m Move) {
 }
 
 func CanApplyMove(s State, c Color, m Move) bool {
-	if IsFirstMoveFor(s, c) {
-		return m.IsMove && CanPlayFirstPiece(s, m.Transformation, m.X, m.Y)
-	}
 	if !m.IsMove {
-		return true
+		// skip move only allowed after first move
+		return s.HasPlayed(c)
 	}
 	if len(s.NotPlayedPiecesFor(c)) == 0 {
 		return false
@@ -138,13 +136,8 @@ func CanApplyMove(s State, c Color, m Move) bool {
 	return CanPlayNextPiece(s, c, m.Transformation, m.X, m.Y)
 }
 
-func IsFirstMoveFor(s State, c Color) bool {
-	return len(s.NotPlayedPiecesFor(c)) == NumPieces
-}
-
-// CanPlayFirstPiece returns true if the TransformedPiece fills an empty start corner
-func CanPlayFirstPiece(s State, p TransformedPiece, x, y uint8) bool {
-	if !IsOnBoard(p, x, y) {
+func canPlayFirstPiece(s State, p TransformedPiece, x, y uint8) bool {
+	if s.StartPiece() != p.Piece() {
 		return false
 	}
 	fillsStartCorner := false
@@ -179,6 +172,9 @@ func IsStartCorner(x, y uint8) bool {
 func CanPlayNextPiece(s State, c Color, p TransformedPiece, x, y uint8) bool {
 	if !IsOnBoard(p, x, y) {
 		return false
+	}
+	if !s.HasPlayed(c) {
+		return canPlayFirstPiece(s, p, x, y)
 	}
 	hasAdjacent := false
 	for _, piecePos := range p.Positions() {
@@ -228,8 +224,8 @@ func HasColorAt(s State, c Color, x, y uint8) bool {
 	return filledColor == c
 }
 
-func PossibleFirstMoves(s State, startPiece Piece) (moves []Move) {
-	for _, tp := range uniquePieceTransformations[startPiece] {
+func possibleFirstMoves(s State) (moves []Move) {
+	for _, tp := range uniquePieceTransformations[s.StartPiece()] {
 		for _, cornerPos := range StartCorners {
 			if cornerPos.X > 0 {
 				cornerPos.X -= tp.Width() - 1
@@ -237,7 +233,7 @@ func PossibleFirstMoves(s State, startPiece Piece) (moves []Move) {
 			if cornerPos.Y > 0 {
 				cornerPos.Y -= tp.Height() - 1
 			}
-			if CanPlayFirstPiece(s, tp, cornerPos.X, cornerPos.Y) {
+			if canPlayFirstPiece(s, tp, cornerPos.X, cornerPos.Y) {
 				move := NewMove(tp, cornerPos.X, cornerPos.Y)
 				moves = append(moves, move)
 			}
@@ -251,6 +247,9 @@ func HasPossibleNextMoves(s State, c Color) bool {
 }
 
 func PossibleNextMoves(s State, c Color) (moves []Move) {
+	if !s.HasPlayed(c) {
+		return possibleFirstMoves(s)
+	}
 	pieces := s.NotPlayedPiecesFor(c)
 	scX, scY, started := StartCorner(s, c)
 	if !started {

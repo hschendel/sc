@@ -2,7 +2,7 @@ package blokus
 
 import "testing"
 
-func TestPossibleFirstMoves(t *testing.T) {
+func TestPossibleNextMovesEmptyField(t *testing.T) {
 	cases := []struct {
 		fp Piece
 		e  []Move
@@ -50,7 +50,8 @@ func TestPossibleFirstMoves(t *testing.T) {
 
 	var s BasicState
 	for i, tc := range cases {
-		o := PossibleFirstMoves(&s, tc.fp)
+		s.SetStartPiece(tc.fp)
+		o := PossibleNextMoves(&s, ColorBlue)
 		if !MovesEqual(tc.e, o) {
 			t.Errorf("case %d for start piece %s: failed\nExpected moves:\n%s\nGot moves:\n%s", i, tc.fp.String(), FormatPrettyMoves(tc.e, 'E', "  "), FormatPrettyMoves(o, 'G', "  "))
 		}
@@ -133,6 +134,7 @@ func benchmarkNextMovesImpl(b *testing.B, s State, c Color, f func(s State, c Co
 
 func earlyTestState() *BasicState {
 	s := new(BasicState)
+	s.SetStartPiece(PieceTetroO)
 
 	MustApplyMove(s, ColorBlue, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 0, 0))
 	MustApplyMove(s, ColorYellow, NewMove(NewTransformedPiece(PieceTetroO, RotationNone, false), 18, 0))

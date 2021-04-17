@@ -32,6 +32,7 @@ type MutableState interface {
 // more efficient mechanisms for copying, or you never copy, but always work on one
 // state variable.
 func CopyState(into MutableState, from State) {
+	into.SetStartPiece(from.StartPiece())
 	for x := uint8(0); x < 20; x++ {
 		for y := uint8(0); y < 20; y++ {
 			color, hasPiece := from.At(x, y)

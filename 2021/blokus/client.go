@@ -67,8 +67,7 @@ func (c *Client) Run() (err error) {
 	}
 	var roomID string
 	var isFirstPlayer bool
-	var startPiece Piece
-	if roomID, isFirstPlayer, startPiece, err = xc.join(c.ReservationCode, c.State); err != nil {
+	if roomID, isFirstPlayer, err = xc.join(c.ReservationCode, c.State); err != nil {
 		err = fmt.Errorf("cannot join game: %s", err)
 		return
 	}
@@ -84,15 +83,6 @@ func (c *Client) Run() (err error) {
 	colorIdx := 0
 	var gameEnded bool
 	var validColors map[Color]bool
-	if gameEnded, validColors, err = xc.waitForMoveRequest(roomID, c.State); err != nil || gameEnded {
-		return
-	}
-	var move Move
-	move = c.Player.FirstMove(c.State, colors[colorIdx], startPiece, sc.NewTimeout(moveTimeout))
-	if err = xc.sendMove(roomID, colors[colorIdx], move); err != nil {
-		err = fmt.Errorf("cannot send move: %s", err)
-		return
-	}
 
 	for {
 		if gameEnded, validColors, err = xc.waitForMoveRequest(roomID, c.State); err != nil || gameEnded {
@@ -109,11 +99,7 @@ func (c *Client) Run() (err error) {
 				continue
 			}
 		}
-		if c.State.HasPlayed(playerColor) {
-			move = c.Player.NextMove(c.State, playerColor, sc.NewTimeout(moveTimeout))
-		} else {
-			move = c.Player.FirstMove(c.State, playerColor, startPiece, sc.NewTimeout(moveTimeout))
-		}
+		move := c.Player.NextMove(c.State, playerColor, sc.NewTimeout(moveTimeout))
 		if err = xc.sendMove(roomID, colors[colorIdx], move); err != nil {
 			err = fmt.Errorf("cannot send move: %s", err)
 			return
@@ -165,7 +151,7 @@ func (x *xmlConn) receive(v interface{}) error {
 	return x.dec.Decode(v)
 }
 
-func (x *xmlConn) join(reservationCode string, intoState MutableState) (roomID string, isFirstPlayer bool, startPiece Piece, err error) {
+func (x *xmlConn) join(reservationCode string, intoState MutableState) (roomID string, isFirstPlayer bool, err error) {
 	if reservationCode != "" {
 		if err = x.sendBytes(protocol.JoinPreparedMessage(reservationCode)); err != nil {
 			return
@@ -195,10 +181,6 @@ func (x *xmlConn) join(reservationCode string, intoState MutableState) (roomID s
 		return
 	}
 	if _, err = fillState(intoState, stateInRoom.Data.State); err != nil {
-		return
-	}
-	if startPiece, err = ParsePiece(stateInRoom.Data.State.StartPiece); err != nil {
-		err = fmt.Errorf("cannot parse startPiece value %q: %s", stateInRoom.Data.State.StartPiece, err)
 		return
 	}
 	return
@@ -270,6 +252,12 @@ func fillState(s MutableState, xs *protocol.State) (validColors map[Color]bool, 
 	}
 	validColors = make(map[Color]bool, 4)
 	s.Reset()
+	if startPiece, parseErr := ParsePiece(xs.StartPiece); parseErr != nil {
+		err = fmt.Errorf("cannot parse startPiece value %q: %s", xs.StartPiece, parseErr)
+		return
+	} else {
+		s.SetStartPiece(startPiece)
+	}
 	if err = setPlayedPieces(s, xs); err != nil {
 		return
 	}

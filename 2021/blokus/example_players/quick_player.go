@@ -10,12 +10,6 @@ import (
 
 type QuickPlayer struct{}
 
-func (q *QuickPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout sc.Timeout) blokus.Move {
-	moves := blokus.PossibleFirstMoves(state, startPiece)
-	move := q.pickBestMove(state, color, moves)
-	return move
-}
-
 func (q *QuickPlayer) NextMove(state blokus.State, color blokus.Color, timeout sc.Timeout) blokus.Move {
 	moves := blokus.PossibleNextMoves(state, color)
 	move := q.pickBestMove(state, color, moves)

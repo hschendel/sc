@@ -108,7 +108,7 @@ const (
 func RunGame(player1, player2 Player) (result GameResult, score1, score2 uint, err1, err2 error) {
 	const timeout = DefaultMoveTimeout
 	var state, copyState BasicState
-	startPiece := AllPieces[RandomInt(len(AllPieces))]
+	state.SetStartPiece(AllPieces[RandomInt(len(AllPieces))])
 	var tr turnTracker
 	tr.players[0] = player1
 	tr.players[1] = player2
@@ -120,42 +120,31 @@ func RunGame(player1, player2 Player) (result GameResult, score1, score2 uint, e
 			continue
 		}
 		CopyState(&copyState, &state)
-		var move Move
 		t := sc.NewTimeout(timeout)
-		var timeoutReached bool
-		if tr.firstRound() {
-			move = player.FirstMove(&copyState, color, startPiece, sc.NewTimeout(timeout))
-			timeoutReached = t.Reached()
-			if move.IsEmpty() {
+		move := player.NextMove(&copyState, color, sc.NewTimeout(timeout))
+		timeoutReached := t.Reached()
+
+		if move.IsEmpty() {
+			if tr.firstRound() {
 				result, err1, err2 = setErrorResult(color, "first move must not be empty")
 				return
 			}
-			if move.Transformation.Piece() != startPiece {
-				result, err1, err2 = setErrorResult(color, "start piece was %s but got %s", startPiece.String(), move.Transformation.Piece().String())
-				return
-			}
-			if !CanPlayFirstPiece(&state, move.Transformation, move.X, move.Y) {
-				result, err1, err2 = setErrorResult(color, "start move is invalid: %s", move.FormatPretty('X', ""))
-				return
-			}
 		} else {
-			move = player.NextMove(&copyState, color, sc.NewTimeout(timeout))
-			timeoutReached = t.Reached()
-			if !move.IsEmpty() {
-				if state.IsPiecePlayed(color, move.Transformation.Piece()) {
-					result, err1, err2 = setErrorResult(color, "invalid move: piece %s was already played", move.Transformation.Piece().String())
-					return
-				}
-				if !CanPlayNextPiece(&state, color, move.Transformation, move.X, move.Y) {
-					result, err1, err2 = setErrorResult(color, "invalid move: %s", move.FormatPretty('X', "  "))
-					return
-				}
+			if state.IsPiecePlayed(color, move.Transformation.Piece()) {
+				result, err1, err2 = setErrorResult(color, "invalid move: piece %s was already played", move.Transformation.Piece().String())
+				return
+			}
+			if !CanPlayNextPiece(&state, color, move.Transformation, move.X, move.Y) {
+				result, err1, err2 = setErrorResult(color, "invalid move: %s", move.FormatPretty('X', "  "))
+				return
 			}
 		}
+
 		if timeoutReached {
 			result, err1, err2 = setErrorResult(color, "player hit timeout")
 			return
 		}
+
 		if !move.IsEmpty() {
 			moveErr := ApplyMove(&state, color, move)
 			if moveErr != nil {

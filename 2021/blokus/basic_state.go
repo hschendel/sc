@@ -48,6 +48,7 @@ func (b *BasicState) IsLastMoveMono(c Color) bool {
 }
 
 func (b *BasicState) HasPlayed(c Color) bool {
+	b.ensureNotPlayedPieces()
 	return len(b.notPlayedPieces[c]) < NumPieces
 }
 
