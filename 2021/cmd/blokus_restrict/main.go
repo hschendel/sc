@@ -9,4 +9,3 @@ func main() {
 	player := new(example_players.RestrictingPlayer)
 	blokus.ClientMain(player)
 }
-

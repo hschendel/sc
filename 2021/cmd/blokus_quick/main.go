@@ -9,4 +9,3 @@ func main() {
 	player := new(example_players.QuickPlayer)
 	blokus.ClientMain(player)
 }
-
