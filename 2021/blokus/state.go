@@ -10,7 +10,13 @@ type State interface {
 	IsPiecePlayed(c Color, p Piece) bool
 	IsLastMoveMono(c Color) bool
 	HasPlayed(c Color) bool
-	// StartPiece returns the game's start piece. For an initial or reset State, it must return PieceMono
+	// IsPlayerOneFirst is true if the first player is/was the first to move. For initial or reset state, it must be true
+	IsPlayerOneFirst() bool
+	// IsColorValid is true if the color c is still playing
+	IsColorValid(c Color) bool
+	// CurrentColor returns the color that is currently playing. For initial or reset State, it must return ColorBlue
+	CurrentColor() Color
+	// StartPiece returns the game's start piece. For initial or reset State, it must return PieceMono
 	StartPiece() Piece
 }
 
@@ -22,6 +28,9 @@ type MutableState interface {
 	SetPiecePlayed(c Color, p Piece, isPlayed bool)
 	SetLastMoveMono(c Color, isLastMoveMono bool)
 	SetStartPiece(piece Piece)
+	SetPlayerOneFirst(isPlayerOneFirst bool)
+	SetColorValid(c Color, isValid bool)
+	SetCurrentColor(c Color)
 }
 
 // CopyState copies from a State instance to a MutableState instance.
@@ -44,6 +53,21 @@ func CopyState(into MutableState, from State) {
 		into.SetNotPlayedPiecesFor(color, from.NotPlayedPiecesFor(color))
 		into.SetLastMoveMono(color, from.IsLastMoveMono(color))
 	}
+}
+
+// IsCurrentPlayerOne returns true if the first player is the current player
+func IsCurrentPlayerOne(s State) bool {
+	return s.CurrentColor() == ColorBlue || s.CurrentColor() == ColorRed
+}
+
+// HasGameEnded is true if the game has ended
+func HasGameEnded(s State) bool {
+	for c := Color(0); c < 4; c++ {
+		if s.IsColorValid(c) {
+			return false
+		}
+	}
+	return true
 }
 
 // ColorDirection gives the "direction" the color is playing, depending on its
@@ -281,7 +305,13 @@ func TestMutableStateReset(t *testing.T, s MutableState) {
 	setDummyPiecesPlayed(s)
 	s.Reset()
 	if s.StartPiece() != PieceMono {
-		t.Errorf("expected StartPiece() to yield %s after Reset(), but got %s", PieceMono.String(), s.StartPiece().String())
+		t.Errorf("expected StartPiece() to be %s after Reset(), but got %s", PieceMono.String(), s.StartPiece().String())
+	}
+	if s.CurrentColor() != ColorBlue {
+		t.Errorf("expected CurrentColor() to be %s after Reset(), but got %s", ColorBlue.String(), s.CurrentColor().String())
+	}
+	if s.IsPlayerOneFirst() != true {
+		t.Errorf("expected IsPlayerOneFirst() to be true after Reset(), but got false")
 	}
 	for x := uint8(0); x < 20; x++ {
 		for y := uint8(0); y < 20; y++ {
@@ -292,6 +322,9 @@ func TestMutableStateReset(t *testing.T, s MutableState) {
 		}
 	}
 	for c := Color(0); c < 4; c++ {
+		if !s.IsColorValid(c) {
+			t.Errorf("expected IsColorValid(%s) to be true, but got false", c.String())
+		}
 		if s.HasPlayed(c) {
 			t.Errorf("expected HasPlayed(%s) to be false, but got true", c.String())
 		}
@@ -319,5 +352,39 @@ func TestMutableStateSetStartPiece(t *testing.T, s MutableState) {
 		if p != g {
 			t.Errorf("expected StartPiece() after SetStartPiece(%s) to be %s, but got %s", p.String(), p.String(), g.String())
 		}
+	}
+}
+
+func TestMutableStateSetCurrentColor(t *testing.T, s MutableState) {
+	for c := Color(0); c < 4; c++ {
+		s.SetCurrentColor(c)
+		g := s.CurrentColor()
+		if c != g {
+			t.Errorf("expected CurrentColor() after SetCurrentColor(%s) to be %s, but got %s", c.String(), c.String(), g.String())
+		}
+	}
+}
+
+func TestMutableStateSetColorValid(t *testing.T, s MutableState) {
+	for c := Color(0); c < 4; c++ {
+		s.SetColorValid(c, true)
+		if !s.IsColorValid(c) {
+			t.Errorf("expected IsColorValid(%s) to be true after setting it, but got false", c.String())
+		}
+		s.SetColorValid(c, false)
+		if s.IsColorValid(c) {
+			t.Errorf("expected IsColorValid(%s) to be false after unsetting it, but got true", c.String())
+		}
+	}
+}
+
+func TestMutableStateSetPlayerOneFirst(t *testing.T, s MutableState) {
+	s.SetPlayerOneFirst(true)
+	if !s.IsPlayerOneFirst() {
+		t.Errorf("expected IsPlayerOneFirst() to be true after setting it, but got false")
+	}
+	s.SetPlayerOneFirst(false)
+	if s.IsPlayerOneFirst() {
+		t.Errorf("expected IsPlayerOneFirst() to be false after setting it, but got true")
 	}
 }

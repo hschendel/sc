@@ -52,3 +52,18 @@ func TestBasicState_SetStartPiece(t *testing.T) {
 	var s BasicState
 	TestMutableStateSetStartPiece(t, &s)
 }
+
+func TestBasicState_SetCurrentColor(t *testing.T) {
+	var s BasicState
+	TestMutableStateSetCurrentColor(t, &s)
+}
+
+func TestBasicState_SetPlayerOneFirst(t *testing.T) {
+	var s BasicState
+	TestMutableStateSetPlayerOneFirst(t, &s)
+}
+
+func TestBasicState_SetColorValid(t *testing.T) {
+	var s BasicState
+	TestMutableStateSetColorValid(t, &s)
+}

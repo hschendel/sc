@@ -8,6 +8,9 @@ type BasicState struct {
 	notPlayedPieces [4][]Piece
 	lastMoveMono    [4]bool
 	startPiece      Piece
+	isPlayerTwoFirst bool // stored inverted, so initial state is correct
+	isColorInvalid  [4]bool // stored inverted, so initial state is correct
+	currentColor    Color
 }
 
 func (b *BasicState) At(x, y uint8) (c Color, hasPiece bool) {
@@ -125,4 +128,28 @@ func (b *BasicState) SetStartPiece(piece Piece) {
 
 func (b *BasicState) StartPiece() Piece {
 	return b.startPiece
+}
+
+func (b *BasicState) IsPlayerOneFirst() bool {
+	return !b.isPlayerTwoFirst
+}
+
+func (b *BasicState) IsColorValid(c Color) bool {
+	return !b.isColorInvalid[c]
+}
+
+func (b *BasicState) CurrentColor() Color {
+	return b.currentColor
+}
+
+func (b *BasicState) SetPlayerOneFirst(isPlayerOneFirst bool) {
+	b.isPlayerTwoFirst = !isPlayerOneFirst
+}
+
+func (b *BasicState) SetColorValid(c Color, isValid bool) {
+	b.isColorInvalid[c] = !isValid
+}
+
+func (b *BasicState) SetCurrentColor(c Color) {
+	b.currentColor = c
 }
