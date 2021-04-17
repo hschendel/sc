@@ -47,3 +47,8 @@ func TestBasicState_SetLastMoveMono(t *testing.T) {
 	var s BasicState
 	TestMutableStateSetLastMoveMono(t, &s)
 }
+
+func TestBasicState_SetStartPiece(t *testing.T) {
+	var s BasicState
+	TestMutableStateSetStartPiece(t, &s)
+}

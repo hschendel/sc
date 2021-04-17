@@ -10,6 +10,8 @@ type State interface {
 	IsPiecePlayed(c Color, p Piece) bool
 	IsLastMoveMono(c Color) bool
 	HasPlayed(c Color) bool
+	// StartPiece returns the game's start piece. For an initial or reset State, it must return PieceMono
+	StartPiece() Piece
 }
 
 type MutableState interface {
@@ -19,6 +21,7 @@ type MutableState interface {
 	SetNotPlayedPiecesFor(c Color, pieces []Piece)
 	SetPiecePlayed(c Color, p Piece, isPlayed bool)
 	SetLastMoveMono(c Color, isLastMoveMono bool)
+	SetStartPiece(piece Piece)
 }
 
 // CopyState copies from a State instance to a MutableState instance.
@@ -276,11 +279,14 @@ func TestMutableStateReset(t *testing.T, s MutableState) {
 	applyDummyStateSets(s)
 	setDummyPiecesPlayed(s)
 	s.Reset()
+	if s.StartPiece() != PieceMono {
+		t.Errorf("expected StartPiece() to yield %s after Reset(), but got %s", PieceMono.String(), s.StartPiece().String())
+	}
 	for x := uint8(0); x < 20; x++ {
 		for y := uint8(0); y < 20; y++ {
 			_, hasPiece := s.At(x, y)
 			if hasPiece {
-				t.Errorf("expected At(%d, %d) to yield hasPiece=false, but go true", x, y)
+				t.Errorf("expected At(%d, %d) to yield hasPiece=false, but got true", x, y)
 			}
 		}
 	}
@@ -302,5 +308,15 @@ func TestMutableStateReset(t *testing.T, s MutableState) {
 			t.Errorf("expected IsLastMoveMono(%s) to be false, but got true", c.String())
 		}
 
+	}
+}
+
+func TestMutableStateSetStartPiece(t *testing.T, s MutableState) {
+	for _, p := range AllPieces {
+		s.SetStartPiece(p)
+		g := s.StartPiece()
+		if p != g {
+			t.Errorf("expected StartPiece() after SetStartPiece(%s) to be %s, but got %s", p.String(), p.String(), g.String())
+		}
 	}
 }

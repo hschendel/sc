@@ -7,6 +7,7 @@ type BasicState struct {
 	board           [20][20]boardValue
 	notPlayedPieces [4][]Piece
 	lastMoveMono    [4]bool
+	startPiece      Piece
 }
 
 func (b *BasicState) At(x, y uint8) (c Color, hasPiece bool) {
@@ -51,6 +52,7 @@ func (b *BasicState) HasPlayed(c Color) bool {
 }
 
 func (b *BasicState) Reset() {
+	b.startPiece = PieceMono
 	for x := 0; x < 20; x++ {
 		for y := 0; y < 20; y++ {
 			b.board[x][y] = boardValue{}
@@ -114,4 +116,12 @@ func (b *BasicState) SetLastMoveMono(c Color, isLastMoveMono bool) {
 type boardValue struct {
 	color    Color
 	hasPiece bool
+}
+
+func (b *BasicState) SetStartPiece(piece Piece) {
+	b.startPiece = piece
+}
+
+func (b *BasicState) StartPiece() Piece {
+	return b.startPiece
 }
