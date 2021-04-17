@@ -40,3 +40,69 @@ func Test_rotateLeft(t *testing.T) {
 		}
 	}
 }
+
+func Test_rotateRight(t *testing.T) {
+	cases := []struct {
+		p Piece
+		e []Position
+	}{
+		{
+			p: PieceDomino,
+			e: []Position{{0, 0}, {0, 1}},
+		},
+		{
+			p: PieceTrioL,
+			e: []Position{{0, 0}, {1, 0}, {0, 1}},
+		},
+	}
+	for i, tc := range cases {
+		o := rotateRight(tc.p.Points())
+		if !PositionsEqual(tc.e, o) {
+			t.Errorf("case %d failed.\nexpected:\n%#v\ngot:\n%#v", i, tc.e, o)
+		}
+	}
+}
+
+func Test_mirror(t *testing.T) {
+	cases := []struct {
+		p Piece
+		e []Position
+	}{
+		{
+			p: PieceDomino,
+			e: []Position{{0, 0}, {1, 0}},
+		},
+		{
+			p: PieceTrioL,
+			e: []Position{{0, 0}, {1, 0}, {1, 1}},
+		},
+	}
+	for i, tc := range cases {
+		o := mirror(tc.p.Points())
+		if !PositionsEqual(tc.e, o) {
+			t.Errorf("case %d failed.\nexpected:\n%#v\ngot:\n%#v", i, tc.e, o)
+		}
+	}
+}
+
+func Test_flipPositions(t *testing.T) {
+	cases := []struct {
+		i []Position
+		e []Position
+	}{
+		{
+			i: []Position{{0, 0}, {1, 0}},
+			e: []Position{{0, 0}, {1, 0}},
+		},
+		{
+			i: []Position{{0, 0}, {1, 0}, {1, 1}},
+			e: []Position{{0, 0}, {1, 0}, {0, 1}},
+		},
+	}
+	for i, tc := range cases {
+		o := flipPositions(tc.i)
+		if !PositionsEqual(tc.e, o) {
+			t.Errorf("case %d failed.\nexpected:\n%#v\ngot:\n%#v", i, tc.e, o)
+		}
+	}
+}

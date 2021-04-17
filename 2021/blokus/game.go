@@ -63,15 +63,15 @@ func RunRepeatedGames(player1, player2 Player, player1Name, player2Name string, 
 }
 
 type RepeatGameResult struct {
-	Draws uint
-	Player1Wins uint
-	Player2Wins uint
-	Player1Errors []error
-	Player2Errors []error
+	Draws             uint
+	Player1Wins       uint
+	Player2Wins       uint
+	Player1Errors     []error
+	Player2Errors     []error
 	Player1TotalScore uint
 	Player2TotalScore uint
-	Player1AvgScore float64
-	Player2AvgScore float64
+	Player1AvgScore   float64
+	Player2AvgScore   float64
 }
 
 func (r *RepeatGameResult) Print(w io.Writer) {
@@ -89,7 +89,7 @@ func (r *RepeatGameResult) Print(w io.Writer) {
 
 func printErrors(w io.Writer, playerName string, errors []error) {
 	if len(errors) != 0 {
-		fmt.Fprintf(w,"\nReported errors for %s:\n", playerName)
+		fmt.Fprintf(w, "\nReported errors for %s:\n", playerName)
 		for _, err := range errors {
 			fmt.Fprintf(w, "  %s\n", err)
 		}
@@ -177,7 +177,7 @@ type turnTracker struct {
 }
 
 func (t *turnTracker) current() (p Player, c Color) {
-	p = t.players[t.color % 2]
+	p = t.players[t.color%2]
 	c = t.color
 	return
 }
@@ -197,7 +197,7 @@ func (t *turnTracker) nextColor() {
 	oldColor := t.color
 	t.color = (t.color + 1) % 4
 	if t.colorEnded[t.color] {
-		t.color = (t.color +2) % 4
+		t.color = (t.color + 2) % 4
 		t.gameEnded = t.colorEnded[t.color]
 		if t.gameEnded {
 			t.color = oldColor

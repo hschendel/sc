@@ -64,7 +64,7 @@ func TestPossibleNextMoves(t *testing.T) {
 	s0.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceTetroO})
 	var s1 BasicState
 	s1.Set(0, 19, ColorRed, true)
-	s1.Set(1,18, ColorRed, true)
+	s1.Set(1, 18, ColorRed, true)
 	s1.Set(0, 17, ColorGreen, true)
 	s1.SetNotPlayedPiecesFor(ColorRed, []Piece{PieceMono})
 	s2 := earlyTestState()
@@ -77,9 +77,9 @@ func TestPossibleNextMoves(t *testing.T) {
 		e []Move
 		l int // expectend length to avoid listing all moves
 	}{
-		{ s: &s0, e: []Move {NewMove(tpTetroO, 17, 17)}},
-		{ s: &s1, e: []Move {NewMove(tpMono, 2, 17), NewMove(tpMono, 2, 19)}},
-		{ s: s2, l: 311},
+		{s: &s0, e: []Move{NewMove(tpTetroO, 17, 17)}},
+		{s: &s1, e: []Move{NewMove(tpMono, 2, 17), NewMove(tpMono, 2, 19)}},
+		{s: s2, l: 311},
 	}
 
 	for i, tc := range cases {
@@ -87,10 +87,24 @@ func TestPossibleNextMoves(t *testing.T) {
 		if tc.e == nil {
 			if tc.l != len(o) {
 				t.Errorf("case %d failed. Expected %d moves but got %d", i, tc.l, len(o))
+			} else {
+				checkMovesForDuplicates(t, o)
 			}
 		} else if !MovesEqual(tc.e, o) {
 			t.Errorf("case %d failed.\nexpected:\n%s\ngot:\n%s", i, FormatPrettyMoves(tc.e, 'X', "  "), FormatPrettyMoves(o, 'X', "  "))
 		}
+	}
+}
+
+func checkMovesForDuplicates(t *testing.T, moves []Move) {
+	t.Helper()
+	moveMap := make(map[Move]int, len(moves))
+	for i, move := range moves {
+		if firstIdx, found := moveMap[move]; found {
+			t.Errorf("Move duplicate at position %d, found first at %d: %s", i, firstIdx, move.FormatPretty('X', "  "))
+			continue
+		}
+		moveMap[move] = i
 	}
 }
 

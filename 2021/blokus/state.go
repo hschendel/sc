@@ -77,7 +77,7 @@ var benchmarkStateAtResult Color
 func BenchmarkStateAt(b *testing.B, s State) {
 	b.Helper()
 	b.StopTimer()
-	positions := []Position{{0, 0}, {19, 19}, {19, 0}, {0, 19}, {9, 10}, {15,15}}
+	positions := []Position{{0, 0}, {19, 19}, {19, 0}, {0, 19}, {9, 10}, {15, 15}}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		for _, pos := range positions {
@@ -144,7 +144,7 @@ var dummyPiecesPlayed = []struct {
 	c Color
 	p Piece
 	e bool
-} {
+}{
 	{ColorBlue, PiecePentoL, true},
 	{ColorGreen, PieceDomino, true},
 	{ColorYellow, PiecePentoW, true},
@@ -172,21 +172,21 @@ func checkDummyPiecesPlayed(t *testing.T, s State) {
 
 func applyDummyStateSets(s MutableState) {
 	s.Set(0, 0, ColorBlue, true)
-	s.Set( 19, 19, ColorRed, true)
-	s.Set( 19, 0, ColorGreen, false)
-	s.Set( 0, 19, ColorYellow, false)
-	s.Set( 9, 10, ColorBlue, true)
-	s.Set( 15, 15, ColorRed, false)
+	s.Set(19, 19, ColorRed, true)
+	s.Set(19, 0, ColorGreen, false)
+	s.Set(0, 19, ColorYellow, false)
+	s.Set(9, 10, ColorBlue, true)
+	s.Set(15, 15, ColorRed, false)
 }
 
-var dummyStateSets = []struct{
-	x uint8
-	y uint8
-	c Color
+var dummyStateSets = []struct {
+	x        uint8
+	y        uint8
+	c        Color
 	hasPiece bool
-} {
-	{ 0, 0, ColorBlue, true },
-	{19,19, ColorRed, true},
+}{
+	{0, 0, ColorBlue, true},
+	{19, 19, ColorRed, true},
 	{19, 0, ColorGreen, false},
 	{0, 19, ColorYellow, false},
 	{9, 10, ColorBlue, true},
@@ -215,7 +215,7 @@ func TestMutableStateSet(t *testing.T, s MutableState) {
 }
 
 func TestMutableStateSetLastMoveMono(t *testing.T, s MutableState) {
-	sets := [4]bool {false, true, false, true}
+	sets := [4]bool{false, true, false, true}
 	for c := Color(0); c < 4; c++ {
 		s.SetLastMoveMono(c, sets[c])
 	}

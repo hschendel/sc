@@ -20,4 +20,3 @@ func (r *RandomPlayer) NextMove(state blokus.State, color blokus.Color, timeout 
 
 func (r *RandomPlayer) End() {
 }
-

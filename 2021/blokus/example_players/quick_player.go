@@ -136,4 +136,3 @@ func countExtent(s blokus.State) (v, n [4]int64) {
 	}
 	return
 }
-
