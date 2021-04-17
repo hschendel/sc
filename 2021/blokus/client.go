@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/hschendel/sc"
 	"github.com/hschendel/sc/2021/blokus/protocol"
 	"io"
 	"log"
@@ -87,7 +88,7 @@ func (c *Client) Run() (err error) {
 		return
 	}
 	var move Move
-	move = c.Player.FirstMove(c.State, colors[colorIdx], startPiece, NewTimeout(moveTimeout))
+	move = c.Player.FirstMove(c.State, colors[colorIdx], startPiece, sc.NewTimeout(moveTimeout))
 	if err = xc.sendMove(roomID, colors[colorIdx], move); err != nil {
 		err = fmt.Errorf("cannot send move: %s", err)
 		return
@@ -109,9 +110,9 @@ func (c *Client) Run() (err error) {
 			}
 		}
 		if c.State.HasPlayed(playerColor) {
-			move = c.Player.NextMove(c.State, playerColor, NewTimeout(moveTimeout))
+			move = c.Player.NextMove(c.State, playerColor, sc.NewTimeout(moveTimeout))
 		} else {
-			move = c.Player.FirstMove(c.State, playerColor, startPiece, NewTimeout(moveTimeout))
+			move = c.Player.FirstMove(c.State, playerColor, startPiece, sc.NewTimeout(moveTimeout))
 		}
 		if err = xc.sendMove(roomID, colors[colorIdx], move); err != nil {
 			err = fmt.Errorf("cannot send move: %s", err)

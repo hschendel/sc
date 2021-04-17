@@ -1,6 +1,7 @@
 package example_players
 
 import (
+	"github.com/hschendel/sc"
 	"github.com/hschendel/sc/2021/blokus"
 	"log"
 	"sort"
@@ -9,13 +10,13 @@ import (
 
 type QuickPlayer struct{}
 
-func (q *QuickPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout blokus.Timeout) blokus.Move {
+func (q *QuickPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout sc.Timeout) blokus.Move {
 	moves := blokus.PossibleFirstMoves(state, startPiece)
 	move := q.pickBestMove(state, color, moves)
 	return move
 }
 
-func (q *QuickPlayer) NextMove(state blokus.State, color blokus.Color, timeout blokus.Timeout) blokus.Move {
+func (q *QuickPlayer) NextMove(state blokus.State, color blokus.Color, timeout sc.Timeout) blokus.Move {
 	moves := blokus.PossibleNextMoves(state, color)
 	move := q.pickBestMove(state, color, moves)
 	return move

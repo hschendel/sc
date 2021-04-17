@@ -1,6 +1,7 @@
 package example_players
 
 import (
+	"github.com/hschendel/sc"
 	"github.com/hschendel/sc/2021/blokus"
 	"log"
 	"sort"
@@ -10,7 +11,7 @@ import (
 // RestrictingPlayer tries to pick the move most restricting the enemy's moves.
 type RestrictingPlayer struct{}
 
-func (rp *RestrictingPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout blokus.Timeout) (move blokus.Move) {
+func (rp *RestrictingPlayer) FirstMove(state blokus.State, color blokus.Color, startPiece blokus.Piece, timeout sc.Timeout) (move blokus.Move) {
 	moves := blokus.PossibleFirstMoves(state, startPiece)
 	bestVolume := uint8(0)
 	for _, m := range moves {
@@ -23,7 +24,7 @@ func (rp *RestrictingPlayer) FirstMove(state blokus.State, color blokus.Color, s
 	return
 }
 
-func (rp *RestrictingPlayer) NextMove(state blokus.State, color blokus.Color, timeout blokus.Timeout) blokus.Move {
+func (rp *RestrictingPlayer) NextMove(state blokus.State, color blokus.Color, timeout sc.Timeout) blokus.Move {
 	moves := blokus.PossibleNextMoves(state, color)
 	presortMoves(state, color, moves)
 	move := rp.pickBestMove(state, color, moves)

@@ -2,6 +2,7 @@ package blokus
 
 import (
 	"fmt"
+	"github.com/hschendel/sc"
 	"io"
 )
 
@@ -120,10 +121,10 @@ func RunGame(player1, player2 Player) (result GameResult, score1, score2 uint, e
 		}
 		CopyState(&copyState, &state)
 		var move Move
-		t := NewTimeout(timeout)
+		t := sc.NewTimeout(timeout)
 		var timeoutReached bool
 		if tr.firstRound() {
-			move = player.FirstMove(&copyState, color, startPiece, NewTimeout(timeout))
+			move = player.FirstMove(&copyState, color, startPiece, sc.NewTimeout(timeout))
 			timeoutReached = t.Reached()
 			if move.IsEmpty() {
 				result, err1, err2 = setErrorResult(color, "first move must not be empty")
@@ -138,7 +139,7 @@ func RunGame(player1, player2 Player) (result GameResult, score1, score2 uint, e
 				return
 			}
 		} else {
-			move = player.NextMove(&copyState, color, NewTimeout(timeout))
+			move = player.NextMove(&copyState, color, sc.NewTimeout(timeout))
 			timeoutReached = t.Reached()
 			if !move.IsEmpty() {
 				if state.IsPiecePlayed(color, move.Transformation.Piece()) {
